@@ -7,7 +7,7 @@ from sqlalchemy import DateTime, ForeignKey, Index, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base
+from ...app.db.base import Base
 
 if TYPE_CHECKING:
     from app.models.session import Session
