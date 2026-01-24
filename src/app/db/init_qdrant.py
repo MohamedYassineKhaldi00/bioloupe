@@ -3,14 +3,14 @@ from __future__ import annotations
 import logging
 from qdrant_client.http import models as rest
 
-from app.core.qdrant_config import (
+from ...app.core.qdrant_config import (
     EXPERIMENTS_COLLECTION,
     PUBLICATIONS_COLLECTION,
     SEQUENCES_COLLECTION,
     UNIFIED_COLLECTION,
     get_all_collections,
 )
-from app.db.qdrant_client import get_qdrant_client
+from ...app.db.qdrant_client import get_qdrant_client
 
 logger = logging.getLogger(__name__)
 
