@@ -7,8 +7,8 @@ from sqlalchemy import Enum, ForeignKey, Index, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base
-from app.models.base import SoftDeleteMixin, TimestampMixin
+from ...app.db.base import Base
+from ...app.models.base import SoftDeleteMixin, TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.session import Session
