@@ -1,0 +1,154 @@
+# ============================================================================
+# Pre-commit Configuration
+# ============================================================================
+# Pre-commit is a framework for managing git hooks that run checks before commits
+# This ensures code quality and consistency across the codebase
+#
+# Installation:
+#   pip install pre-commit
+#   pre-commit install
+#
+# Usage:
+#   pre-commit run --all-files  # Run on all files
+#   pre-commit run              # Run on staged files
+#   git commit                  # Automatically runs hooks
+
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+default_language_version:
+  python: python3.11
+
+repos:
+  # ============================================================================
+  # Pre-commit built-in hooks
+  # ============================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # Prevent giant files from being committed
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+
+      # Check for files that would conflict in case-insensitive filesystems
+      - id: check-case-conflict
+
+      # Check for merge conflicts
+      - id: check-merge-conflict
+
+      # Check for debugger imports and breakpoint() calls
+      - id: debug-statements
+
+      # Check YAML files for parseable syntax
+      - id: check-yaml
+        args: ["--unsafe"]
+
+      # Check JSON files for parseable syntax
+      - id: check-json
+
+      # Check TOML files for parseable syntax
+      - id: check-toml
+
+      # Ensure files end with a newline
+      - id: end-of-file-fixer
+
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+
+      # Fix mixed line endings
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  # ============================================================================
+  # Black - Code Formatter
+  # ============================================================================
+  - repo: https://github.com/psf/black
+    rev: 24.1.1
+    hooks:
+      - id: black
+        name: Format code with Black
+        language_version: python3.11
+        args: ["--config", "pyproject.toml"]
+
+  # ============================================================================
+  # isort - Import Sorter
+  # ============================================================================
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: Sort imports with isort
+        args: ["--settings-path", "pyproject.toml"]
+
+  # ============================================================================
+  # Flake8 - Linter
+  # ============================================================================
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        name: Lint code with Flake8
+        args: ["--config", ".flake8"]
+        additional_dependencies:
+          - flake8-docstrings
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-simplify
+
+  # ============================================================================
+  # MyPy - Static Type Checker
+  # ============================================================================
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        name: Type check with MyPy
+        args: ["--config-file", "mypy.ini"]
+        additional_dependencies:
+          - types-redis
+          - types-passlib
+          - sqlalchemy[mypy]
+          - pydantic
+        exclude: ^(tests/|alembic/versions/)
+
+  # ============================================================================
+  # Additional Security and Quality Checks
+  # ============================================================================
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        name: Security check with Bandit
+        args: ["-c", "pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
+        exclude: ^tests/
+
+  # ============================================================================
+  # Markdown and Documentation
+  # ============================================================================
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      # Detect common spelling mistakes
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+      - id: python-use-type-annotations
+      - id: rst-backticks
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
+
+# ============================================================================
+# CI Configuration
+# ============================================================================
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+
+    For more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ""
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
