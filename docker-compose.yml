@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: bioloupe-postgres
+    environment:
+      POSTGRES_DB: bioloupe
+      POSTGRES_USER: bioloupe
+      POSTGRES_PASSWORD: bioloupe
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  qdrant:
+    image: qdrant/qdrant:v1.9.1
+    container_name: bioloupe-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  minio:
+    image: minio/minio:RELEASE.2024-05-10T01-41-38Z
+    container_name: bioloupe-minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: bioloupe-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
+  qdrant_data:
+  minio_data:
