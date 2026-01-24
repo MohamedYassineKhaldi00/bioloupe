@@ -4,8 +4,8 @@ import logging
 from typing import Iterable
 from qdrant_client.http import models as rest
 
-from app.core.exceptions import VectorDBException
-from app.db.qdrant_client import QdrantClientWrapper, get_qdrant_client
+from ...app.core.exceptions import VectorDBException
+from ...app.db.qdrant_client import QdrantClientWrapper, get_qdrant_client
 
 logger = logging.getLogger(__name__)
 
