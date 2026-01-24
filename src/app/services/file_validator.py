@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import os
-from app.core.exceptions import StorageException
-from app.core.storage_config import STORAGE_LIMITS
-from app.models.material import MaterialType
+from ...app.core.exceptions import StorageException
+from ...app.core.storage_config import STORAGE_LIMITS
+from ...app.models.material import MaterialType
 
 ALLOWED_TYPES: dict[MaterialType, dict[str, set[str]]] = {
     MaterialType.paper: {
