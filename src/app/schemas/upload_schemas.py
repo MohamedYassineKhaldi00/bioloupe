@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
-from app.models.material import MaterialType
+from ...app.models.material import MaterialType
 
 
 class InitiateUploadRequest(BaseModel):
