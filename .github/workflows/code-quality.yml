@@ -6,8 +6,8 @@ on:
       - main
       - backend_dev
       - develop
-      - 'feat/**'
-      - 'fix/**'
+      - "feat/**"
+      - "fix/**"
   pull_request:
     branches:
       - main
@@ -180,4 +180,3 @@ jobs:
             echo "❌ Some checks failed"
             exit 1
           fi
-

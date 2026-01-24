@@ -3,9 +3,16 @@ name: CI
 on:
   push:
     branches:
-      - '*'  
+      - main
+      - backend_dev
+      - develop
+      - 'feat/**'
+      - 'fix/**'
   pull_request:
-    branches: [main, backend_dev]
+    branches:
+      - main
+      - backend_dev
+      - develop
 
 jobs:
   lint-and-test:
@@ -23,7 +30,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: pip
 
       - name: Install dependencies
         run: |
