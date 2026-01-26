@@ -465,10 +465,6 @@ git commit -m "feat: add new feature"
 git push origin feat/your-feature
 ```
 
-## 📝 License
-
-[Add your license here]
-
 ## 🙏 Acknowledgments
 
 Built with:
@@ -478,16 +474,3 @@ Built with:
 - Qdrant for vector search
 - Redis for caching and rate limiting
 - MinIO for S3-compatible storage
-
-## 📞 Support
-
-For questions and support:
-
-- 📖 Check the documentation in the `/docs` folder
-- 🐛 Report bugs via GitHub Issues
-- 💡 Request features via GitHub Issues
-- 📧 Contact the team at [your-email]
-
----
-
-**Built with ❤️ for the scientific research community**
