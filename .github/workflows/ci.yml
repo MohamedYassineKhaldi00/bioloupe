@@ -6,8 +6,8 @@ on:
       - main
       - backend_dev
       - develop
-      - 'feat/**'
-      - 'fix/**'
+      - "feat/**"
+      - "fix/**"
   pull_request:
     branches:
       - main

@@ -28,6 +28,7 @@ from .core.exceptions import (
     VectorDBException,
 )
 from .core.middleware import RequestIDMiddleware, TimingMiddleware
+from .middleware.audit_middleware import AuditMiddleware
 from .middleware.logging_middleware import configure_logging
 
 logger = logging.getLogger(__name__)
@@ -42,9 +43,9 @@ async def lifespan(app: FastAPI):
 
 def create_app() -> FastAPI:
     configure_logging()
-    
+
     settings = get_settings()
-    
+
     app = FastAPI(
         title="BioLoupe API",
         description="Collaborative biotech research platform",
@@ -54,20 +55,21 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
         openapi_url="/api/openapi.json",
     )
-    
+
     configure_middleware(app)
     configure_exception_handlers(app)
     configure_routes(app)
-    
+
     logger.info("FastAPI application configured", extra={"environment": settings.environment})
-    
+
     return app
 
 
 def configure_middleware(app: FastAPI) -> None:
     app.add_middleware(RequestIDMiddleware)
     app.add_middleware(TimingMiddleware)
-    
+    app.add_middleware(AuditMiddleware)
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -90,7 +92,7 @@ def configure_exception_handlers(app: FastAPI) -> None:
 
 def configure_routes(app: FastAPI) -> None:
     app.include_router(api_router, prefix="/api/v1")
-    
+
     return app
 
 
