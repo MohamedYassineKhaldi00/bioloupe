@@ -14,6 +14,10 @@ os.environ["MINIO_ENDPOINT"] = "localhost:9000"
 os.environ["MINIO_ACCESS_KEY"] = "minioadmin"
 os.environ["MINIO_SECRET_KEY"] = "minioadmin"
 os.environ["MINIO_SECURE"] = "false"
+os.environ["JWT_SECRET_KEY"] = "test-secret-key-for-testing-only-not-for-production"
+os.environ["JWT_ALGORITHM"] = "HS256"
+os.environ["JWT_ACCESS_TOKEN_EXPIRE_MINUTES"] = "30"
+os.environ["JWT_REFRESH_TOKEN_EXPIRE_DAYS"] = "7"
 
 
 @pytest.fixture(scope="session")
