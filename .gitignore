@@ -13,8 +13,15 @@ ENV/
 # pytest
 .pytest_cache/
 
-# Editor directories
-.vscode/
+# Development tool caches
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+.tox/
+
+# Editor directories (keep VS Code settings for team)
 .idea/
 
 # Distribution / packaging

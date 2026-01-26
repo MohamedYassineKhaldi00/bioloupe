@@ -1,0 +1,61 @@
+# ============================================================================
+# Flake8 Configuration
+# ============================================================================
+# Flake8 is a linting tool that checks Python code for style and quality issues
+# This configuration ensures compatibility with Black and follows PEP 8 guidelines
+
+[flake8]
+# Maximum line length (matches Black configuration)
+max-line-length = 100
+
+# Maximum complexity for functions (cyclomatic complexity)
+max-complexity = 10
+
+# Error codes to ignore
+# E203: whitespace before ':' (conflicts with Black formatting)
+# E501: line too long (handled by Black)
+# W503: line break before binary operator (conflicts with Black)
+extend-ignore = E203, E501, W503
+
+# Exclude patterns - directories and files to skip
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    env,
+    .tox,
+    .eggs,
+    *.egg,
+    build,
+    dist,
+    .mypy_cache,
+    .pytest_cache,
+    htmlcov,
+    migrations,
+    alembic/versions
+
+# Per-file ignores
+per-file-ignores =
+    __init__.py:F401,F403
+    tests/*:E501,F401,F811
+
+# Show source code for each error
+show-source = True
+
+# Show statistics at the end
+count = True
+
+# Enable specific error classes
+select =
+    E,   # pycodestyle errors
+    W,   # pycodestyle warnings
+    F,   # pyflakes
+    C,   # mccabe complexity
+    N,   # pep8-naming
+
+# Docstring conventions (PEP 257)
+docstring-convention = google
+
+# Enable color output (if terminal supports it)
+color = auto

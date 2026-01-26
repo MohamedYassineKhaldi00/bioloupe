@@ -8,10 +8,10 @@ from datetime import datetime, timezone
 
 import aioboto3
 
-from app.core.config import get_settings
-from app.core.exceptions import StorageException
-from app.core.storage_config import STORAGE_BUCKETS, STORAGE_LIMITS
-from app.models.material import MaterialType
+from ...app.core.config import get_settings
+from ...app.core.exceptions import StorageException
+from ...app.core.storage_config import STORAGE_BUCKETS, STORAGE_LIMITS
+from ...app.models.material import MaterialType
 
 logger = logging.getLogger(__name__)
 
