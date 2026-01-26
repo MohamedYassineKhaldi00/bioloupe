@@ -25,8 +25,30 @@ class Settings(BaseSettings):
 
     environment: str = Field(default="development", alias="ENVIRONMENT")
 
+    jwt_secret_key: str = Field(..., alias="JWT_SECRET_KEY")
+    jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
+    access_token_expire_minutes: int = Field(default=15, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    refresh_token_expire_days: int = Field(default=7, alias="REFRESH_TOKEN_EXPIRE_DAYS")
+
+    google_client_id: str | None = Field(default=None, alias="GOOGLE_CLIENT_ID")
+    google_client_secret: str | None = Field(default=None, alias="GOOGLE_CLIENT_SECRET")
+    microsoft_client_id: str | None = Field(default=None, alias="MICROSOFT_CLIENT_ID")
+    microsoft_client_secret: str | None = Field(default=None, alias="MICROSOFT_CLIENT_SECRET")
+    orcid_client_id: str | None = Field(default=None, alias="ORCID_CLIENT_ID")
+    orcid_client_secret: str | None = Field(default=None, alias="ORCID_CLIENT_SECRET")
+    oauth_redirect_base_url: str = Field(
+        default="http://localhost:3000", alias="OAUTH_REDIRECT_BASE_URL"
+    )
+
     seed_admin_email: str | None = Field(default=None, alias="SEED_ADMIN_EMAIL")
     seed_admin_password: str | None = Field(default=None, alias="SEED_ADMIN_PASSWORD")
+
+    audit_log_retention_days: int = Field(
+        default=90, alias="AUDIT_LOG_RETENTION_DAYS"
+    )
+    audit_enable_background_logging: bool = Field(
+        default=True, alias="AUDIT_ENABLE_BACKGROUND_LOGGING"
+    )
 
 
 @lru_cache
