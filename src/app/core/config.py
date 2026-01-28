@@ -25,6 +25,11 @@ class Settings(BaseSettings):
 
     environment: str = Field(default="development", alias="ENVIRONMENT")
 
+    jwt_secret_key: str = Field("change-me", alias="JWT_SECRET_KEY")
+    jwt_algorithm: str = Field("HS256", alias="JWT_ALGORITHM")
+    access_token_expire_minutes: int = Field(60 * 24, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    invitation_token_ttl_hours: int = Field(72, alias="INVITATION_TOKEN_TTL_HOURS")
+
     seed_admin_email: str | None = Field(default=None, alias="SEED_ADMIN_EMAIL")
     seed_admin_password: str | None = Field(default=None, alias="SEED_ADMIN_PASSWORD")
 
