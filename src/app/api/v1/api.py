@@ -2,13 +2,32 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from ...api.v1.endpoints import audit, auth, embeddings, health, oauth, uploads
-
 api_router = APIRouter()
 
+# Core endpoints
+from ...api.v1.endpoints import users, teams
+api_router.include_router(users.router)
+api_router.include_router(teams.router)
+
+# Health, auth, oauth, audit
+from ...api.v1.endpoints import health, auth, oauth, audit
 api_router.include_router(health.router, tags=["health"])
-api_router.include_router(uploads.router, tags=["uploads"])
 api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(oauth.router, tags=["oauth"])
 api_router.include_router(audit.router, prefix="/admin", tags=["audit"])
-api_router.include_router(embeddings.router, tags=["embeddings"])
+
+# Sessions, materials, uploads endpoints
+try:
+    from ...api.v1.endpoints import sessions, materials, uploads
+    api_router.include_router(sessions.router)
+    api_router.include_router(materials.router)
+    api_router.include_router(uploads.router)
+except Exception:
+    pass
+
+# Embeddings endpoint
+try:
+    from ...api.v1.endpoints import embeddings
+    api_router.include_router(embeddings.router, tags=["embeddings"])
+except Exception:
+    pass

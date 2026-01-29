@@ -95,6 +95,10 @@ def configure_routes(app: FastAPI) -> None:
     app.include_router(api_router, prefix="/api/v1")
     app.mount("/ws", ws_app)
 
+    @app.get("/health")
+    async def health() -> dict[str, str]:
+        return {"status": "ok"}
+
     return app
 
 

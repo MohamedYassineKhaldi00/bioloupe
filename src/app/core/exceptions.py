@@ -24,6 +24,45 @@ class CacheException(BioLoupeException):
     pass
 
 
+# Resource and permission exceptions
+class ResourceNotFound(BioLoupeException):
+    def __init__(self, resource: str, resource_id: str) -> None:
+        super().__init__(f"{resource} with id {resource_id} not found", status_code=404)
+
+
+class PermissionDenied(BioLoupeException):
+    def __init__(self, message: str = "Permission denied", required_permission: str | None = None) -> None:
+        if required_permission:
+            message = f"{message}. Required permission: {required_permission}"
+        super().__init__(message, status_code=status.HTTP_403_FORBIDDEN)
+
+
+class TeamNotFound(ResourceNotFound):
+    def __init__(self, team_id: str) -> None:
+        super().__init__("Team", team_id)
+
+
+class SessionNotFound(ResourceNotFound):
+    def __init__(self, session_id: str) -> None:
+        super().__init__("Session", session_id)
+
+
+class MaterialNotFound(ResourceNotFound):
+    def __init__(self, material_id: str) -> None:
+        super().__init__("Material", material_id)
+
+
+class InvitationExpired(BioLoupeException):
+    def __init__(self) -> None:
+        super().__init__("Invitation expired", status_code=400)
+
+
+class InvitationInvalid(BioLoupeException):
+    def __init__(self) -> None:
+        super().__init__("Invalid invitation token", status_code=400)
+
+
+# ML and embedding exceptions
 class ModelLoadError(BioLoupeException):
     def __init__(self, message: str = "Failed to load model") -> None:
         super().__init__(message, status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -77,24 +116,6 @@ class InvalidRequest(BioLoupeException):
 class InvalidOAuthState(BioLoupeException):
     def __init__(self) -> None:
         super().__init__("Invalid or expired OAuth state", status.HTTP_400_BAD_REQUEST)
-
-
-class PermissionDenied(BioLoupeException):
-    def __init__(self, message: str, required_permission: str) -> None:
-        super().__init__(
-            f"{message}. Required permission: {required_permission}",
-            status.HTTP_403_FORBIDDEN
-        )
-
-
-class TeamNotFound(BioLoupeException):
-    def __init__(self, team_id: str) -> None:
-        super().__init__(f"Team not found: {team_id}", status.HTTP_404_NOT_FOUND)
-
-
-class SessionNotFound(BioLoupeException):
-    def __init__(self, session_id: str) -> None:
-        super().__init__(f"Session not found: {session_id}", status.HTTP_404_NOT_FOUND)
 
 
 class NotTeamMember(BioLoupeException):

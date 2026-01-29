@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from ....schemas.upload_schemas import (
+from app.schemas.upload_schemas import (
     CompleteMultipartUploadRequest,
     CompleteMultipartUploadResponse,
     InitiateUploadRequest,
@@ -11,8 +11,8 @@ from ....schemas.upload_schemas import (
     PresignedDownloadResponse,
     PresignedPart,
 )
-from ....services.file_validator import validate_file
-from ....services.storage_service import StorageService
+from app.services.file_validator import validate_file
+from app.services.storage_service import StorageService
 
 router = APIRouter(prefix="/uploads", tags=["uploads"])
 

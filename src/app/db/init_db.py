@@ -4,9 +4,9 @@ import logging
 from passlib.context import CryptContext
 from sqlalchemy import select
 
-from ...app.core.config import get_settings
-from ...app.db.base import Base, async_session_maker, engine, verify_connection
-from ...app.models import Team, TeamMember, TeamRole, User
+from app.core.config import get_settings
+from app.db.base import Base, async_session_maker, engine, verify_connection
+from app.models import Team, TeamMember, TeamRole, User
 
 logger = logging.getLogger(__name__)
 
