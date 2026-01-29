@@ -30,6 +30,7 @@ from .core.exceptions import (
 from .core.middleware import RequestIDMiddleware, TimingMiddleware
 from .middleware.audit_middleware import AuditMiddleware
 from .middleware.logging_middleware import configure_logging
+from .websocket.server import ws_app
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +93,7 @@ def configure_exception_handlers(app: FastAPI) -> None:
 
 def configure_routes(app: FastAPI) -> None:
     app.include_router(api_router, prefix="/api/v1")
+    app.mount("/ws", ws_app)
 
     return app
 
