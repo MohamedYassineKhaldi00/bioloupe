@@ -50,6 +50,17 @@ class Settings(BaseSettings):
         default=True, alias="AUDIT_ENABLE_BACKGROUND_LOGGING"
     )
 
+    websocket_cors_origins: str = Field(
+        default="http://localhost:3000",
+        alias="WEBSOCKET_CORS_ORIGINS"
+    )
+    websocket_ping_timeout: int = Field(
+        default=60, alias="WEBSOCKET_PING_TIMEOUT"
+    )
+    websocket_ping_interval: int = Field(
+        default=30, alias="WEBSOCKET_PING_INTERVAL"
+    )
+
 
 @lru_cache
 def get_settings() -> Settings:
