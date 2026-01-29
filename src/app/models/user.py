@@ -6,8 +6,8 @@ from sqlalchemy import Boolean, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
-from ...app.db.base import Base
-from ...app.models.base import TimestampMixin
+from app.db.base import Base
+from app.models.base import TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.activity_log import ActivityLog
@@ -47,6 +47,7 @@ class User(Base, TimestampMixin):
     activity_logs: Mapped[list["ActivityLog"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+
     audit_logs: Mapped[list["AuditLog"]] = relationship(
         back_populates="user"
     )

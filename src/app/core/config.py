@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
     access_token_expire_minutes: int = Field(default=15, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
     refresh_token_expire_days: int = Field(default=7, alias="REFRESH_TOKEN_EXPIRE_DAYS")
+    invitation_token_ttl_hours: int = Field(default=72, alias="INVITATION_TOKEN_TTL_HOURS")
 
     google_client_id: str | None = Field(default=None, alias="GOOGLE_CLIENT_ID")
     google_client_secret: str | None = Field(default=None, alias="GOOGLE_CLIENT_SECRET")
@@ -40,15 +41,16 @@ class Settings(BaseSettings):
         default="http://localhost:3000", alias="OAUTH_REDIRECT_BASE_URL"
     )
 
-    seed_admin_email: str | None = Field(default=None, alias="SEED_ADMIN_EMAIL")
-    seed_admin_password: str | None = Field(default=None, alias="SEED_ADMIN_PASSWORD")
-
     audit_log_retention_days: int = Field(
         default=90, alias="AUDIT_LOG_RETENTION_DAYS"
     )
     audit_enable_background_logging: bool = Field(
         default=True, alias="AUDIT_ENABLE_BACKGROUND_LOGGING"
     )
+
+    seed_admin_email: str | None = Field(default=None, alias="SEED_ADMIN_EMAIL")
+    seed_admin_password: str | None = Field(default=None, alias="SEED_ADMIN_PASSWORD")
+
 
 
 @lru_cache

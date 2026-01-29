@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from redis.asyncio import ConnectionPool, Redis, RedisCluster
 
-from ...app.core.config import get_settings
+from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 

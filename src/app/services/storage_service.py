@@ -8,10 +8,10 @@ from datetime import datetime, timezone
 
 import aioboto3
 
-from ...app.core.config import get_settings
-from ...app.core.exceptions import StorageException
-from ...app.core.storage_config import STORAGE_BUCKETS, STORAGE_LIMITS
-from ...app.models.material import MaterialType
+from app.core.config import get_settings
+from app.core.exceptions import StorageException
+from app.core.storage_config import STORAGE_BUCKETS, STORAGE_LIMITS
+from app.models.material import MaterialType
 
 logger = logging.getLogger(__name__)
 
@@ -153,6 +153,18 @@ class StorageService:
         async with self.client() as client:
             await client.delete_object(Bucket=bucket, Key=key)
 
+    async def file_exists(self, bucket: str, key: str) -> bool:
+        async with self.client() as client:
+            try:
+                await client.head_object(Bucket=bucket, Key=key)
+                return True
+            except Exception:
+                return False
+
+    async def get_object_size(self, bucket: str, key: str) -> int:
+        async with self.client() as client:
+            response = await client.head_object(Bucket=bucket, Key=key)
+            return int(response.get("ContentLength", 0))
     async def cleanup_orphaned_objects(
         self,
         valid_keys: set[str],

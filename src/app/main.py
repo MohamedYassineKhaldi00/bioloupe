@@ -93,6 +93,10 @@ def configure_exception_handlers(app: FastAPI) -> None:
 def configure_routes(app: FastAPI) -> None:
     app.include_router(api_router, prefix="/api/v1")
 
+    @app.get("/health")
+    async def health() -> dict[str, str]:
+        return {"status": "ok"}
+
     return app
 
 
