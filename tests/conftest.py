@@ -1,18 +1,29 @@
+from __future__ import annotations
+
 import sys
 import os
+import asyncio
+from typing import Generator
+import types
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
 # Minimal environment for tests to avoid Pydantic Settings validation errors at import time
-import os
+# Defaults chosen to avoid requiring external services during unit tests; CI can override these.
+os.environ.setdefault("ENVIRONMENT", "test")
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
 os.environ.setdefault("QDRANT_URL", "http://localhost:6333")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("MINIO_ENDPOINT", "http://localhost:9000")
 os.environ.setdefault("MINIO_ACCESS_KEY", "minioadmin")
 os.environ.setdefault("MINIO_SECRET_KEY", "minioadmin")
+os.environ.setdefault("MINIO_SECURE", "false")
+os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-for-testing-only-not-for-production")
+os.environ.setdefault("JWT_ALGORITHM", "HS256")
+os.environ.setdefault("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30")
+os.environ.setdefault("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7")
 
 # If aiosqlite is not installed in the test environment, provide a minimal dummy module
-import types, sys
 aiosqlite_mod = sys.modules.setdefault("aiosqlite", types.ModuleType("aiosqlite"))
 # provide a few attributes SQLAlchemy's dialect expects during import
 setattr(aiosqlite_mod, "DatabaseError", Exception)
@@ -81,20 +92,21 @@ import pytest
 from types import SimpleNamespace
 from fastapi.testclient import TestClient
 
-# Ensure app runs in TESTING mode to avoid initializing heavy infra at import time
-import os
-os.environ.setdefault("TESTING", "1")
 
-# Rely on the app's own TESTING mode in `app.db.base` to avoid initializing a real DB engine during tests.
-
-from app.main import create_app
-from app.api.dependencies.auth import get_current_active_user
-from app.db.base import get_db
+@pytest.fixture(scope="session")
+def event_loop() -> Generator:
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest.fixture(scope="session")
 def app():
     """Create the FastAPI app with basic dependency overrides for tests."""
+    from app.main import create_app
+    from app.api.dependencies.auth import get_current_active_user
+    from app.db.base import get_db
+
     app = create_app()
 
     # simple test user object used by auth dependency override

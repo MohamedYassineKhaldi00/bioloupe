@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - backend_dev
+      - develop
+      - "feat/**"
+      - "fix/**"
+  pull_request:
+    branches:
+      - main
+      - backend_dev
+      - develop
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run linting with ruff
+        run: |
+          ruff check src/ tests/
+
+      - name: Run type checking with mypy
+        run: |
+          mypy src/
+        continue-on-error: true
+
+      - name: Run tests with pytest
+        env:
+          DATABASE_URL: postgresql+asyncpg://bioloupe:bioloupe@localhost:5432/bioloupe_test
+          REDIS_URL: redis://localhost:6379/1
+          QDRANT_URL: http://localhost:6333
+          MINIO_ENDPOINT: localhost:9000
+          MINIO_ACCESS_KEY: minioadmin
+          MINIO_SECRET_KEY: minioadmin
+          MINIO_SECURE: "false"
+          ENVIRONMENT: test
+        run: |
+          pytest tests/ -v --cov=src --cov-report=term-missing
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        if: matrix.python-version == '3.11'
+        with:
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: bioloupe_test
+          POSTGRES_USER: bioloupe
+          POSTGRES_PASSWORD: bioloupe
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7.2-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      qdrant:
+        image: qdrant/qdrant:v1.9.1
+        ports:
+          - 6333:6333

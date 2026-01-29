@@ -62,6 +62,10 @@ else:
 
 
 async def verify_connection(retries: int = 5, base_delay: float = 0.5) -> None:
+    if engine is None:
+        logger.info("Skipping DB connection verification in TESTING mode")
+        return
+
     for attempt in range(1, retries + 1):
         try:
             async with engine.connect() as conn:

@@ -165,7 +165,6 @@ class StorageService:
         async with self.client() as client:
             response = await client.head_object(Bucket=bucket, Key=key)
             return int(response.get("ContentLength", 0))
-
     async def cleanup_orphaned_objects(
         self,
         valid_keys: set[str],

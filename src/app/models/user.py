@@ -11,7 +11,9 @@ from app.models.base import TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.activity_log import ActivityLog
+    from app.models.audit_log import AuditLog
     from app.models.material import Material
+    from app.models.oauth_account import OAuthAccount
     from app.models.session import Session, SessionParticipant
     from app.models.team import Team, TeamMember
 
@@ -43,5 +45,12 @@ class User(Base, TimestampMixin):
         back_populates="uploaded_by", cascade="all, delete-orphan"
     )
     activity_logs: Mapped[list["ActivityLog"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+
+    audit_logs: Mapped[list["AuditLog"]] = relationship(
+        back_populates="user"
+    )
+    oauth_accounts: Mapped[list["OAuthAccount"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
