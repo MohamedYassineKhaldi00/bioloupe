@@ -12,6 +12,7 @@ from ..core.exceptions import (
     BioLoupeException,
     CacheException,
     DatabaseException,
+    RateLimitExceeded,
     StorageException,
     VectorDBException,
 )
@@ -92,6 +93,20 @@ async def vector_db_exception_handler(request: Request, exc: VectorDBException) 
     return JSONResponse(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         content={"detail": "Vector search service unavailable", "type": "vector_db_error"}
+    )
+
+
+async def rate_limit_exception_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
+    logger.warning(
+        "Rate limit exception",
+        extra={
+            "error": str(exc),
+            "path": request.url.path,
+        }
+    )
+    return JSONResponse(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        content={"detail": exc.detail, "type": "rate_limit"},
     )
 
 

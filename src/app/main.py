@@ -16,6 +16,7 @@ from .core.exception_handlers import (
     cache_exception_handler,
     database_exception_handler,
     generic_exception_handler,
+    rate_limit_exception_handler,
     storage_exception_handler,
     validation_exception_handler,
     vector_db_exception_handler,
@@ -24,6 +25,7 @@ from .core.exceptions import (
     BioLoupeException,
     CacheException,
     DatabaseException,
+    RateLimitExceeded,
     StorageException,
     VectorDBException,
 )
@@ -86,6 +88,7 @@ def configure_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(CacheException, cache_exception_handler)
     app.add_exception_handler(StorageException, storage_exception_handler)
     app.add_exception_handler(VectorDBException, vector_db_exception_handler)
+    app.add_exception_handler(RateLimitExceeded, rate_limit_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
     app.add_exception_handler(ValidationError, validation_exception_handler)
     app.add_exception_handler(Exception, generic_exception_handler)

@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     aws_s3_bucket_prefix: str = Field(default="bioloupe", alias="AWS_S3_BUCKET_PREFIX")
 
     environment: str = Field(default="development", alias="ENVIRONMENT")
+    read_replica_url: str | None = Field(default=None, alias="READ_REPLICA_URL")
+    db_pool_size: int = Field(default=20, alias="DB_POOL_SIZE")
+    db_max_overflow: int = Field(default=0, alias="DB_MAX_OVERFLOW")
 
     jwt_secret_key: str = Field(..., alias="JWT_SECRET_KEY")
     jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
@@ -63,6 +66,30 @@ class Settings(BaseSettings):
     websocket_ping_interval: int = Field(
         default=30, alias="WEBSOCKET_PING_INTERVAL"
     )
+
+    pubmed_search_url: str = Field(
+        default="https://api.ncbi.nlm.nih.gov/lit/ctxp/v1/pubmed/", alias="PUBMED_SEARCH_URL"
+    )
+    arxiv_search_url: str = Field(
+        default="http://export.arxiv.org/api/query", alias="ARXIV_SEARCH_URL"
+    )
+    search_cache_ttl_seconds: int = Field(
+        default=300, alias="SEARCH_CACHE_TTL_SECONDS"
+    )
+    publication_cache_ttl_seconds: int = Field(
+        default=900, alias="PUBLICATION_CACHE_TTL_SECONDS"
+    )
+    slow_query_threshold_ms: int = Field(default=100, alias="SLOW_QUERY_THRESHOLD_MS")
+    vector_search_cache_ttl_seconds: int = Field(
+        default=300, alias="VECTOR_SEARCH_CACHE_TTL_SECONDS"
+    )
+    embedding_cache_ttl_seconds: int = Field(
+        default=3600, alias="EMBEDDING_CACHE_TTL_SECONDS"
+    )
+    rate_limit_window_seconds: int = Field(
+        default=60, alias="RATE_LIMIT_WINDOW_SECONDS"
+    )
+    rate_limit_per_user: int = Field(default=60, alias="RATE_LIMIT_PER_USER")
 
 
 @lru_cache

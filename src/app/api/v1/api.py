@@ -36,3 +36,23 @@ try:
     api_router.include_router(embeddings.router, tags=["embeddings"])
 except Exception:
     pass
+
+try:
+    from app.api.v1.endpoints import performance
+
+    api_router.include_router(performance.router)
+except Exception:
+    pass
+
+try:
+    from app.search.routers import (
+        global_search_router,
+        publication_search_router,
+        similarity_router,
+    )
+
+    api_router.include_router(global_search_router)
+    api_router.include_router(publication_search_router)
+    api_router.include_router(similarity_router)
+except Exception:
+    pass
