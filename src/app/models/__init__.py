@@ -4,6 +4,7 @@ from .session import Session, SessionParticipant, SessionPermission
 from .material import Material, MaterialType
 from .activity_log import ActivityLog
 from .audit_log import AuditLog, AuditAction, ResourceType
+from .saved_search import SavedSearch
 
 __all__ = [
     "User",
@@ -19,4 +20,5 @@ __all__ = [
     "AuditLog",
     "AuditAction",
     "ResourceType",
+    "SavedSearch",
 ]

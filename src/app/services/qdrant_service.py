@@ -127,6 +127,25 @@ class QdrantService:
             logger.error("Qdrant delete collection failed", extra={"error": str(exc)})
             raise VectorDBException(f"Failed to delete collection: {exc}") from exc
 
+    async def update_collection_config(
+        self,
+        collection: str,
+        quantization_config: rest.QuantizationConfig | None = None,
+        hnsw_config: rest.HnswConfigDiff | None = None,
+    ) -> None:
+        if quantization_config is None and hnsw_config is None:
+            return
+        try:
+            await self._wrapper.with_retry(
+                self._wrapper.client.update_collection,
+                collection_name=collection,
+                quantization_config=quantization_config,
+                hnsw_config=hnsw_config,
+            )
+        except Exception as exc:
+            logger.error("Qdrant update collection failed", extra={"error": str(exc)})
+            raise VectorDBException(f"Failed to update collection config: {exc}") from exc
+
     async def health_check(self) -> bool:
         try:
             await self._wrapper.with_retry(self._wrapper.client.get_collections)

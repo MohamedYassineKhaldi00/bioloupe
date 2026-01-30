@@ -24,6 +24,12 @@ class CacheException(BioLoupeException):
     pass
 
 
+class RateLimitExceeded(BioLoupeException):
+    def __init__(self, remaining: int, reset_in: int) -> None:
+        message = f"Rate limit exceeded, try again in {reset_in} seconds"
+        super().__init__(message, status_code=status.HTTP_429_TOO_MANY_REQUESTS)
+
+
 # Resource and permission exceptions
 class ResourceNotFound(BioLoupeException):
     def __init__(self, resource: str, resource_id: str) -> None:

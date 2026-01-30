@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections.abc import AsyncGenerator
+from typing import AsyncIterator
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
@@ -17,15 +18,17 @@ class Base(DeclarativeBase):
 
 
 settings = get_settings()
+import os
+
+# Engines and session makers used by the runtime.
+engine = None
+async_session_maker = None
+replica_engine = None
+replica_session_maker = None
 
 # During tests we prefer not to initialize a real DB engine (missing drivers in test env).
 # Honor TESTING=1 to skip expensive engine creation and provide a simple fake session.
-import os
-
 if os.environ.get("TESTING"):
-    engine = None
-    async_session_maker = None
-
     class _DummySession:
         async def commit(self):
             pass
@@ -38,15 +41,26 @@ if os.environ.get("TESTING"):
 
     async def get_db() -> AsyncGenerator[AsyncSession, None]:
         yield _DummySession()
+
+    async def get_replica_db() -> AsyncGenerator[AsyncSession, None]:
+        yield _DummySession()
 else:
     engine = create_async_engine(
         settings.database_url,
-        pool_size=20,
-        max_overflow=0,
+        pool_size=settings.db_pool_size,
+        max_overflow=settings.db_max_overflow,
         pool_pre_ping=True,
     )
 
     async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+    if settings.read_replica_url:
+        replica_engine = create_async_engine(
+            settings.read_replica_url,
+            pool_size=settings.db_pool_size,
+            max_overflow=settings.db_max_overflow,
+            pool_pre_ping=True,
+        )
+        replica_session_maker = async_sessionmaker(replica_engine, expire_on_commit=False)
 
 
     async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -59,6 +73,16 @@ else:
                 raise
             finally:
                 await session.close()
+
+
+    async def get_replica_db() -> AsyncGenerator[AsyncSession, None]:
+        if replica_session_maker is None:
+            async for session in get_db():
+                yield session
+            return
+
+        async with replica_session_maker() as session:
+            yield session
 
 
 async def verify_connection(retries: int = 5, base_delay: float = 0.5) -> None:
