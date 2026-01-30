@@ -90,6 +90,16 @@ class Settings(BaseSettings):
         default=60, alias="RATE_LIMIT_WINDOW_SECONDS"
     )
     rate_limit_per_user: int = Field(default=60, alias="RATE_LIMIT_PER_USER")
+    # AI/LLM configuration
+    llm_default_model: str = Field(
+        default="gpt-4o-mini", alias="LLM_DEFAULT_MODEL"
+    )
+    llm_default_temperature: float = Field(
+        default=0.7, alias="LLM_DEFAULT_TEMPERATURE"
+    )
+    llm_default_max_tokens: int = Field(
+        default=4000, alias="LLM_DEFAULT_MAX_TOKENS"
+    )
 
 
 @lru_cache
