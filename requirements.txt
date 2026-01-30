@@ -28,3 +28,6 @@ psutil>=5.9.0
 pymupdf>=1.23.0
 pytesseract>=0.3.10
 websockets>=11.0.0
+
+# AI and LLM dependencies
+litellm>=1.0.0
