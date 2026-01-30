@@ -28,5 +28,11 @@ try:
     api_router.include_router(materials.router)
     api_router.include_router(uploads.router)
 except Exception:
-    # Swallow import errors to allow app import in test environments
+    pass
+
+# Embeddings endpoint (optional)
+try:
+    from app.api.v1.endpoints import embeddings
+    api_router.include_router(embeddings.router, tags=["embeddings"])
+except Exception:
     pass

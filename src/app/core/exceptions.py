@@ -24,6 +24,7 @@ class CacheException(BioLoupeException):
     pass
 
 
+# Resource and permission exceptions
 class ResourceNotFound(BioLoupeException):
     def __init__(self, resource: str, resource_id: str) -> None:
         super().__init__(f"{resource} with id {resource_id} not found", status_code=404)
@@ -59,6 +60,27 @@ class InvitationExpired(BioLoupeException):
 class InvitationInvalid(BioLoupeException):
     def __init__(self) -> None:
         super().__init__("Invalid invitation token", status_code=400)
+
+
+# ML and embedding exceptions
+class ModelLoadError(BioLoupeException):
+    def __init__(self, message: str = "Failed to load model") -> None:
+        super().__init__(message, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class EmbeddingError(BioLoupeException):
+    def __init__(self, message: str = "Failed to generate embedding") -> None:
+        super().__init__(message, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class DeviceError(BioLoupeException):
+    def __init__(self, message: str = "Device allocation failed") -> None:
+        super().__init__(message, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class InvalidPaperError(BioLoupeException):
+    def __init__(self, message: str = "Invalid paper data") -> None:
+        super().__init__(message, status.HTTP_400_BAD_REQUEST)
 
 
 class InvalidCredentials(BioLoupeException):
@@ -110,3 +132,18 @@ class NotSessionParticipant(BioLoupeException):
             f"User {user_id} is not a participant of session {session_id}",
             status.HTTP_403_FORBIDDEN
         )
+
+
+class ImageLoadError(BioLoupeException):
+    def __init__(self, message: str = "Failed to load image") -> None:
+        super().__init__(message, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UnsupportedFormatError(BioLoupeException):
+    def __init__(self, message: str = "Unsupported image format") -> None:
+        super().__init__(message, status.HTTP_400_BAD_REQUEST)
+
+
+class InvalidChannelError(BioLoupeException):
+    def __init__(self, message: str = "Invalid microscopy channel") -> None:
+        super().__init__(message, status.HTTP_400_BAD_REQUEST)
