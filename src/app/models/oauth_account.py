@@ -6,8 +6,8 @@ from sqlalchemy import String, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
-from ...app.db.base import Base
-from ...app.models.base import TimestampMixin
+from app.db.base import Base
+from app.models.base import TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.user import User

@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-from ...app.models.audit_log import AuditAction, ResourceType
+from app.models.audit_log import AuditAction, ResourceType
 
 
 class AuditLogResponse(BaseModel):

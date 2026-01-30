@@ -5,18 +5,18 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...app.api.dependencies.auth import get_current_active_user
-from ...app.core.config import get_settings
-from ...app.core.exceptions import InvalidOAuthState, InvalidRequest
-from ...app.core.security import create_access_token, create_refresh_token, hash_password
-from ...app.db.base import get_db
-from ...app.models.user import User
-from ...app.schemas.oauth_schemas import (
+from app.api.dependencies.auth import get_current_active_user
+from app.core.config import get_settings
+from app.core.exceptions import InvalidOAuthState, InvalidRequest
+from app.core.security import create_access_token, create_refresh_token, hash_password
+from app.db.base import get_db
+from app.models.user import User
+from app.schemas.oauth_schemas import (
     OAuthAuthorizationResponse,
     OAuthLoginResponse,
     OAuthLinkResponse,
 )
-from ...app.services import oauth_service, oauth_state_service
+from app.services import oauth_service, oauth_state_service
 
 router = APIRouter(prefix="/oauth", tags=["oauth"])
 

@@ -99,6 +99,10 @@ def configure_routes(app: FastAPI) -> None:
     async def health() -> dict[str, str]:
         return {"status": "ok"}
 
+    @app.get("/health")
+    async def health() -> dict[str, str]:
+        return {"status": "ok"}
+
     return app
 
 

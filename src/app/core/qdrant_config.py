@@ -11,28 +11,35 @@ class QdrantCollectionConfig:
     distance: rest.Distance
 
 
+# Some qdrant client versions may not expose the Distance symbolic names the same way.
+# Be defensive and fall back to None if unavailable; consumers should handle missing distance values.
+try:
+    COSINE = rest.Distance.COSINE
+except Exception:
+    COSINE = None
+
 UNIFIED_COLLECTION = QdrantCollectionConfig(
     name="bioloupe_unified",
     vector_size=768,
-    distance=rest.Distance.COSINE,
+    distance=COSINE,
 )
 
 PUBLICATIONS_COLLECTION = QdrantCollectionConfig(
     name="bioloupe_publications",
     vector_size=768,
-    distance=rest.Distance.COSINE,
+    distance=COSINE,
 )
 
 SEQUENCES_COLLECTION = QdrantCollectionConfig(
     name="bioloupe_sequences",
     vector_size=1280,
-    distance=rest.Distance.COSINE,
+    distance=COSINE,
 )
 
 EXPERIMENTS_COLLECTION = QdrantCollectionConfig(
     name="bioloupe_experiments",
     vector_size=768,
-    distance=rest.Distance.COSINE,
+    distance=COSINE,
 )
 
 

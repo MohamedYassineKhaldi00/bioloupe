@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker/Dockerfile
+    image: bioloupe_worker:latest
+    environment:
+      - REDIS_URL=${REDIS_URL}
+      - DATABASE_URL=${DATABASE_URL}
+      - QDRANT_URL=${QDRANT_URL}
+    depends_on:
+      - redis
+      - qdrant
+      - minio
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+    command: celery -A app.worker.celery_app worker -B --loglevel=info -Q embeddings,indexing,notifications,maintenance -c ${WORKER_CONCURRENCY:-4}
