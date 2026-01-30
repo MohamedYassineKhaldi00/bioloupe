@@ -7,9 +7,9 @@ from typing import Callable
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from ...app.db.base import async_session_maker
-from ...app.models.audit_log import AuditAction, ResourceType
-from ...app.services.audit_service import log_audit_background
+from app.db.base import async_session_maker
+from app.models.audit_log import AuditAction, ResourceType
+from app.services.audit_service import log_audit_background
 
 logger = logging.getLogger(__name__)
 
