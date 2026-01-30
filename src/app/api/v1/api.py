@@ -31,3 +31,10 @@ try:
     api_router.include_router(embeddings.router, tags=["embeddings"])
 except Exception:
     pass
+
+# AI/Hypothesis generation endpoint
+try:
+    from ...api.v1.endpoints import hypotheses
+    api_router.include_router(hypotheses.router, tags=["hypotheses"])
+except Exception:
+    pass
