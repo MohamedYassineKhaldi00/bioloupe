@@ -64,6 +64,17 @@ class Settings(BaseSettings):
         default=30, alias="WEBSOCKET_PING_INTERVAL"
     )
 
+    # AI/LLM configuration
+    llm_default_model: str = Field(
+        default="gpt-4o-mini", alias="LLM_DEFAULT_MODEL"
+    )
+    llm_default_temperature: float = Field(
+        default=0.7, alias="LLM_DEFAULT_TEMPERATURE"
+    )
+    llm_default_max_tokens: int = Field(
+        default=4000, alias="LLM_DEFAULT_MAX_TOKENS"
+    )
+
 
 @lru_cache
 def get_settings() -> Settings:
