@@ -36,6 +36,10 @@ def get_redis() -> Redis | RedisCluster:
     return Redis(connection_pool=_get_pool())
 
 
+# Alias for backward compatibility
+get_redis_client = get_redis
+
+
 async def close_redis() -> None:
     global _pool
     global _cluster

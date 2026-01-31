@@ -4,16 +4,16 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from ....app.core.config import get_settings
-from ....app.core.exceptions import InvalidToken
-from ....app.core.security import (
+from app.core.config import get_settings
+from app.core.exceptions import InvalidToken
+from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
     validate_token_type,
 )
-from ....app.db.redis_client import get_redis
-from ....app.schemas.auth_schemas import TokenResponse
+from app.db.redis_client import get_redis
+from app.schemas.auth_schemas import TokenResponse
 
 
 async def generate_token_pair(user_id: uuid.UUID, email: str) -> TokenResponse:

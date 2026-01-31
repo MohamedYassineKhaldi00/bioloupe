@@ -124,9 +124,22 @@ async def validation_exception_handler(
     
     errors = exc.errors() if hasattr(exc, 'errors') else [{"msg": str(exc)}]
     
+    # Convert any non-serializable objects (like UUIDs) to strings
+    def make_serializable(obj):
+        if isinstance(obj, dict):
+            return {k: make_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [make_serializable(item) for item in obj]
+        elif isinstance(obj, (str, int, float, bool, type(None))):
+            return obj
+        else:
+            return str(obj)
+    
+    serializable_errors = make_serializable(errors)
+    
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": errors, "type": "validation_error"}
+        content={"detail": serializable_errors, "type": "validation_error"}
     )
 
 

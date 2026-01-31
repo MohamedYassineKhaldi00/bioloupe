@@ -5,6 +5,7 @@ from .material import Material, MaterialType
 from .activity_log import ActivityLog
 from .audit_log import AuditLog, AuditAction, ResourceType
 from .saved_search import SavedSearch
+from .oauth_account import OAuthAccount
 
 __all__ = [
     "User",
@@ -21,4 +22,5 @@ __all__ = [
     "AuditAction",
     "ResourceType",
     "SavedSearch",
+    "OAuthAccount",
 ]
