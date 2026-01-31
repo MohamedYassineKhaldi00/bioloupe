@@ -17,8 +17,12 @@ services:
       MINIO_SECURE: "false"
       AWS_REGION: us-east-1
       ENVIRONMENT: development
+      JWT_SECRET_KEY: your-super-secret-jwt-key-change-in-production
+      REQUIRE_EMAIL_VERIFICATION: "false"
     ports:
       - "8000:8000"
+    volumes:
+      - ./src:/app/src
     depends_on:
       - postgres
       - redis
