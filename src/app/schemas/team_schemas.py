@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, EmailStr
+from uuid import UUID
+from pydantic import BaseModel, ConfigDict, EmailStr, field_serializer
 
 from app.models import TeamRole
 
@@ -19,30 +20,44 @@ class TeamUpdate(BaseModel):
 class TeamResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: str | UUID
     name: str
     description: str | None = None
-    created_by_id: str
+    created_by_id: str | UUID
     created_at: datetime
     updated_at: datetime
 
+    @field_serializer("id", "created_by_id")
+    def serialize_uuid(self, v: str | UUID) -> str:
+        return str(v)
+
 
 class TeamListResponse(BaseModel):
-    id: str
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str | UUID
     name: str
     description: str | None = None
     role: TeamRole
     member_count: int
 
+    @field_serializer("id")
+    def serialize_uuid(self, v: str | UUID) -> str:
+        return str(v)
+
 
 class TeamMemberResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
-    team_id: str
-    user_id: str
+    id: str | UUID
+    team_id: str | UUID
+    user_id: str | UUID
     role: TeamRole
     joined_at: datetime
+
+    @field_serializer("id", "team_id", "user_id")
+    def serialize_uuid(self, v: str | UUID) -> str:
+        return str(v)
 
 
 class TeamMemberCreate(BaseModel):

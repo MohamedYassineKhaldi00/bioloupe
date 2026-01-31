@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...app.core.config import get_settings
-from ...app.db.base import async_session_maker
-from ...app.models.audit_log import AuditLog
+from app.core.config import get_settings
+from app.db.base import async_session_maker
+from app.models.audit_log import AuditLog
 
 logger = logging.getLogger(__name__)
 
