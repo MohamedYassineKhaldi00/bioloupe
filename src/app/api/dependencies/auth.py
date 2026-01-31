@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import InvalidToken, InactiveUser, EmailNotVerified
 from app.core.security import decode_token, validate_token_type
+from app.core.config import get_settings
 from app.db.base import get_db
 from app.models.user import User
 
@@ -49,7 +50,8 @@ async def get_current_active_user(current_user: Annotated[User, Depends(get_curr
     if not current_user.is_active:
         raise InactiveUser()
 
-    if not current_user.is_verified:
+    settings = get_settings()
+    if settings.require_email_verification and not current_user.is_verified:
         raise EmailNotVerified()
 
     return current_user

@@ -69,50 +69,6 @@ async def update_team(
     service = TeamService(db)
     team = await service.update_team(team_id, payload.name, payload.description)
     return TeamResponse.model_validate(team)
-=======
-@router.get("/{team_id}")
-async def get_team(
-    team_id: str,
-    membership: Annotated[TeamMember, Depends(
-        lambda tid, user, svc, cache: require_team_permission(
-            tid,
-            [TeamRole.owner, TeamRole.admin, TeamRole.member, TeamRole.viewer],
-            user, svc, cache
-        )
-    )],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "team_id": team_id,
-        "user_role": membership.role.value,
-        "message": "Team retrieved successfully"
-    }
-
-
-@router.post("/{team_id}/members")
-async def add_team_member(
-    team_id: str,
-    membership: Annotated[TeamMember, Depends(require_team_admin)],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "team_id": team_id,
-        "message": "Member added successfully"
-    }
-
-
-@router.delete("/{team_id}/members/{user_id}")
-async def remove_team_member(
-    team_id: str,
-    user_id: str,
-    membership: Annotated[TeamMember, Depends(require_team_admin)],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "team_id": team_id,
-        "user_id": user_id,
-        "message": "Member removed successfully"
-    }
 
 
 @router.delete("/{team_id}")
@@ -226,11 +182,3 @@ async def accept_invitation(
     service = TeamService(db)
     await service.add_member(invitation.team_id, str(current_user.id), invitation.role)
     return {"status": "accepted"}
-=======
-    membership: Annotated[TeamMember, Depends(require_team_owner)],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "team_id": team_id,
-        "message": "Team deleted successfully"
-    }

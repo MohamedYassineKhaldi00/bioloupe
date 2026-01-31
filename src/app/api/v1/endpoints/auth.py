@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Annotated
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.auth import get_current_user
@@ -18,7 +18,7 @@ from app.schemas.auth_schemas import (
     VerifyEmailRequest,
 )
 from app.services.rate_limiter import RateLimiter
-from ....app.services.token_service import (
+from app.services.token_service import (
     blacklist_refresh_token,
     extract_user_id_from_payload,
     generate_password_reset_token,
@@ -26,7 +26,7 @@ from ....app.services.token_service import (
     is_token_blacklisted,
     validate_and_decode_token,
 )
-from ....app.services.user_auth_service import (
+from app.services.user_auth_service import (
     authenticate_user_credentials,
     create_user_account,
     get_user_by_id,
@@ -66,7 +66,7 @@ async def refresh_token(
     request: RefreshTokenRequest,
     db: Annotated[AsyncSession, Depends(get_db)]
 ) -> TokenResponse:
-    from ....app.core.exceptions import InvalidToken
+    from app.core.exceptions import InvalidToken
 
     if await is_token_blacklisted(request.refresh_token):
         raise InvalidToken()
@@ -82,12 +82,13 @@ async def refresh_token(
     return await generate_token_pair(user.id, user.email)
 
 
-@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
 async def logout(
     refresh_token: str,
     current_user: Annotated[User, Depends(get_current_user)]
-) -> None:
+) -> Response:
     await blacklist_refresh_token(refresh_token)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post("/verify-email", response_model=UserResponse)

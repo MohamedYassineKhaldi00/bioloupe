@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from typing import Annotated
-from fastapi import APIRouter, Depends, Query, HTTPException, status
+from fastapi import APIRouter, Depends, Path, Query, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.auth import get_current_active_user
@@ -23,7 +23,7 @@ router = APIRouter(prefix="/oauth", tags=["oauth"])
 
 @router.get("/{provider}/authorize", response_model=OAuthAuthorizationResponse)
 async def get_authorization_url(
-    provider: str = Query(..., pattern="^(google|microsoft|orcid)$")
+    provider: str = Path(..., pattern="^(google|microsoft|orcid)$")
 ) -> OAuthAuthorizationResponse:
     settings = get_settings()
     state = await oauth_state_service.generate_oauth_state()
