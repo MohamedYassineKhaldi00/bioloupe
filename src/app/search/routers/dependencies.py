@@ -30,4 +30,3 @@ def get_external_publication_client() -> ExternalPublicationClient:
 
 def get_saved_search_service(db: AsyncSession = Depends(DBSessionDep)) -> SavedSearchService:
     return SavedSearchService(SavedSearchRepository(db))
-*** End Patch

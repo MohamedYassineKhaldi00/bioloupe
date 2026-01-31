@@ -206,7 +206,7 @@ async def get_cached_embedding(
 async def invalidate_embedding_cache(
     material_id: uuid.UUID,
     service: Annotated[UnifiedEmbeddingService, Depends(get_unified_service)],
-) -> None:
+):
     """Invalidate cached embedding.
 
     Args:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import secrets
-from ...app.db.redis_client import get_redis
+from app.db.redis_client import get_redis
 
 
 STATE_TTL_SECONDS = 600

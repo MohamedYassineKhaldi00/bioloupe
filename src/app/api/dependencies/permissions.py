@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Iterable
+import uuid
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,18 +20,19 @@ ROLE_ORDER = {
 
 
 async def require_team_permission(
-    team_id: str,
+    team_id: str | uuid.UUID,
     required_roles: Iterable[TeamRole] | None = None,
     current_user=Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
 ) -> TeamMember:
-    team = await db.get(Team, team_id)
+    team_uuid = team_id if isinstance(team_id, uuid.UUID) else uuid.UUID(team_id)
+    team = await db.get(Team, team_uuid)
     if not team:
-        raise TeamNotFound(team_id)
+        raise TeamNotFound(str(team_id))
 
     result = await db.execute(
         select(TeamMember).where(
-            TeamMember.team_id == team_id,
+            TeamMember.team_id == team_uuid,
             TeamMember.user_id == current_user.id,
         )
     )
@@ -43,7 +45,7 @@ async def require_team_permission(
 
 def team_role_required(required_roles: Iterable[TeamRole]):
     async def dependency(
-        team_id: str,
+        team_id: str | uuid.UUID,
         current_user=Depends(get_current_active_user),
         db: AsyncSession = Depends(get_db),
     ) -> TeamMember:

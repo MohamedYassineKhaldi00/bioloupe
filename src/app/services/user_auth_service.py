@@ -6,10 +6,10 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ....app.core.security import hash_password, validate_password_strength
-from ....app.db.base import get_db
-from ....app.models.user import User
-from ....app.schemas.auth_schemas import RegisterRequest
+from app.core.security import hash_password, validate_password_strength
+from app.db.base import get_db
+from app.models.user import User
+from app.schemas.auth_schemas import RegisterRequest
 
 
 async def create_user_account(
@@ -55,8 +55,8 @@ async def create_user_account(
 
 
 async def authenticate_user_credentials(email: str, password: str, db: AsyncSession) -> User:
-    from ....app.core.exceptions import InvalidCredentials
-    from ....app.core.security import verify_password
+    from app.core.exceptions import InvalidCredentials
+    from app.core.security import verify_password
 
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
@@ -79,7 +79,7 @@ async def get_user_by_id(user_id: uuid.UUID, db: AsyncSession) -> User | None:
 
 
 async def mark_email_verified(user_id: uuid.UUID, db: AsyncSession) -> User:
-    from ....app.core.exceptions import InvalidToken
+    from app.core.exceptions import InvalidToken
 
     user = await get_user_by_id(user_id, db)
     if not user:
@@ -93,7 +93,7 @@ async def mark_email_verified(user_id: uuid.UUID, db: AsyncSession) -> User:
 
 
 async def update_user_password(user_id: uuid.UUID, new_password: str, db: AsyncSession) -> User:
-    from ....app.core.exceptions import InvalidToken
+    from app.core.exceptions import InvalidToken
 
     is_valid, message = validate_password_strength(new_password)
     if not is_valid:

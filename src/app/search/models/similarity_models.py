@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field, root_validator, constr
+from pydantic import BaseModel, Field, model_validator, constr
 
 
 class SimilarityExplorationRequest(BaseModel):
@@ -13,7 +13,8 @@ class SimilarityExplorationRequest(BaseModel):
     timeframe_days: int = Field(default=30, ge=1)
     limit: int = Field(default=12, ge=1, le=50)
 
-    @root_validator
+    @model_validator(mode='before')
+    @classmethod
     def require_vector_or_material(cls, values):
         if not values.get("query_vector") and not values.get("material_id"):
             raise ValueError("query_vector or material_id is required")

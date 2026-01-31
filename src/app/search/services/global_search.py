@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 from collections import Counter
 from typing import Iterable
@@ -208,18 +209,4 @@ class GlobalSearchService:
             "score": score,
             "metadata": {"material_type": material.material_type.value, "metadata": material.metadata_},
             "explanation": {"match": "material"},
-        }from __future__ import annotations
-
-import asyncio
-import logging
-import time
-from collections import Counter
-from typing import Iterable
-
-from sqlalchemy import select, or_, func
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.core.config import get_settings
-from app.models import Material, Session as SessionModel, Team, User
-from app.schemas import ???
-*** End Patch
+        }

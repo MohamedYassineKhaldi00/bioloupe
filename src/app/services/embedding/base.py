@@ -12,7 +12,7 @@ import numpy as np
 
 from app.core.exceptions import EmbeddingError
 from app.core.ml_config import ModelConfig, get_ml_settings
-from app.db.redis_client import get_redis_client
+from app.db.redis_client import get_redis
 
 logger = logging.getLogger(__name__)
 
@@ -146,7 +146,7 @@ class BaseEmbeddingService(ABC):
             Cached embedding or None
         """
         try:
-            redis_client = get_redis_client()
+            redis_client = get_redis()
             cached_bytes = await redis_client.get(cache_key)
 
             if cached_bytes:
@@ -166,7 +166,7 @@ class BaseEmbeddingService(ABC):
             embedding: Embedding to cache
         """
         try:
-            redis_client = get_redis_client()
+            redis_client = get_redis()
             embedding_bytes = embedding.astype(np.float32).tobytes()
             await redis_client.setex(
                 cache_key,

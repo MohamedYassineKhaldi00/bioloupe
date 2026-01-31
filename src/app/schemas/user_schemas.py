@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr
 
@@ -7,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 class UserPublic(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: uuid.UUID
     full_name: str
     orcid_id: str | None = None
 
@@ -15,7 +16,7 @@ class UserPublic(BaseModel):
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: uuid.UUID
     email: EmailStr
     full_name: str
     orcid_id: str | None = None

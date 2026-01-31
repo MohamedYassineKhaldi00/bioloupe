@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     db_pool_size: int = Field(default=20, alias="DB_POOL_SIZE")
     db_max_overflow: int = Field(default=0, alias="DB_MAX_OVERFLOW")
 
+    # Service control flags for local development
+    disable_vector_search: bool = Field(default=False, alias="DISABLE_VECTOR_SEARCH")
+    disable_embeddings: bool = Field(default=False, alias="DISABLE_EMBEDDINGS")
+    disable_minio: bool = Field(default=False, alias="DISABLE_MINIO")
+
     jwt_secret_key: str = Field(..., alias="JWT_SECRET_KEY")
     jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
     access_token_expire_minutes: int = Field(default=15, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
@@ -54,6 +59,14 @@ class Settings(BaseSettings):
     # Admin seeding
     seed_admin_email: str | None = Field(default=None, alias="SEED_ADMIN_EMAIL")
     seed_admin_password: str | None = Field(default=None, alias="SEED_ADMIN_PASSWORD")
+
+    # Demo account for quick evaluation (development only)
+    demo_enabled: bool = Field(default=True, alias="DEMO_ENABLED")
+    demo_email: str = Field(default="demo@example.com", alias="DEMO_EMAIL")
+    demo_password: str = Field(default="DemoPass1!", alias="DEMO_PASSWORD")
+    demo_full_name: str = Field(default="Demo User", alias="DEMO_FULL_NAME")
+    demo_team_name: str = Field(default="Demo Team", alias="DEMO_TEAM_NAME")
+    demo_session_title: str = Field(default="Welcome to BioLoupe", alias="DEMO_SESSION_TITLE")
 
     # WebSocket configuration
     websocket_cors_origins: str = Field(

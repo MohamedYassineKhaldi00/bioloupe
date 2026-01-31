@@ -7,7 +7,7 @@ Request/response models for hypothesis generation endpoints.
 from __future__ import annotations
 
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class HypothesisGenerationRequest(BaseModel):
@@ -109,6 +109,8 @@ class HypothesisResponse(BaseModel):
 
 class HypothesesListResponse(BaseModel):
     """Response model for list of generated hypotheses."""
+
+    model_config = ConfigDict(protected_namespaces=())
 
     session_id: str = Field(..., description="Session ID")
     research_goal: str = Field(..., description="Research goal")

@@ -9,7 +9,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...app.models.audit_log import AuditAction, AuditLog, ResourceType
+from ..models.audit_log import AuditAction, AuditLog, ResourceType
 
 logger = logging.getLogger(__name__)
 

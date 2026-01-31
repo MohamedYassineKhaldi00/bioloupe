@@ -4,10 +4,11 @@ import enum
 import uuid
 from typing import TYPE_CHECKING
 from sqlalchemy import Enum, ForeignKey, Index, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base
+from ..db.base import Base
 from app.models.base import SoftDeleteMixin, TimestampMixin
 
 if TYPE_CHECKING:
@@ -38,7 +39,7 @@ class Material(Base, TimestampMixin, SoftDeleteMixin):
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     file_url: Mapped[str | None] = mapped_column(Text, nullable=True)
-    metadata_: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True)
+    metadata_: Mapped[dict | None] = mapped_column("metadata", JSON, nullable=True)
     qdrant_point_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
 
     session: Mapped["Session"] = relationship(back_populates="materials")

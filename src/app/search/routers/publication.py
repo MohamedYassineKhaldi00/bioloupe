@@ -59,10 +59,11 @@ async def list_saved_searches(
     return await service.list_saved(str(user.id))
 
 
-@router.delete("/saved/{search_id}", status_code=204)
+@router.delete("/saved/{search_id}", status_code=200)
 async def delete_saved_search(
     search_id: str,
     service: PublicationSearchService = Depends(get_publication_search_service),
     user=Depends(get_current_active_user),
-) -> None:
+) -> dict[str, str]:
     await service.delete_saved(str(user.id), search_id)
+    return {"status": "deleted"}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from typing import Iterable
+import uuid
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,26 +19,32 @@ PERMISSION_ORDER = {
 }
 
 
-async def get_session(session_id: str, db: AsyncSession = Depends(get_db)) -> Session:
-    session = await db.get(Session, session_id)
+def _as_uuid(value: str | uuid.UUID) -> uuid.UUID:
+    return value if isinstance(value, uuid.UUID) else uuid.UUID(value)
+
+
+async def get_session(session_id: str | uuid.UUID, db: AsyncSession = Depends(get_db)) -> Session:
+    session_uuid = _as_uuid(session_id)
+    session = await db.get(Session, session_uuid)
     if not session or session.deleted_at is not None:
-        raise SessionNotFound(session_id)
+        raise SessionNotFound(str(session_id))
     return session
 
 
 async def require_session_permission(
-    session_id: str,
+    session_id: str | uuid.UUID,
     required_permissions: Iterable[SessionPermission],
     current_user=Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
 ) -> Session:
-    session = await db.get(Session, session_id)
+    session_uuid = _as_uuid(session_id)
+    session = await db.get(Session, session_uuid)
     if not session or session.deleted_at is not None:
-        raise SessionNotFound(session_id)
+        raise SessionNotFound(str(session_id))
 
     result = await db.execute(
         select(SessionParticipant).where(
-            SessionParticipant.session_id == session_id,
+            SessionParticipant.session_id == session_uuid,
             SessionParticipant.user_id == current_user.id,
         )
     )
@@ -55,7 +62,7 @@ async def require_session_permission(
 
 def session_permission_required(required_permissions: Iterable[SessionPermission]):
     async def dependency(
-        session_id: str,
+        session_id: str | uuid.UUID,
         current_user=Depends(get_current_active_user),
         db: AsyncSession = Depends(get_db),
     ) -> Session:
@@ -65,7 +72,7 @@ def session_permission_required(required_permissions: Iterable[SessionPermission
 
 
 async def get_session_with_permission(
-    session_id: str,
+    session_id: str | uuid.UUID,
     permission: SessionPermission,
     current_user=Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),

@@ -12,11 +12,11 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import Select, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ....app.api.dependencies.auth import get_current_active_user
-from ....app.db.base import get_db
-from ....app.models.audit_log import AuditLog
-from ....app.models.user import User
-from ....app.schemas.audit_schemas import (
+from app.api.dependencies.auth import get_current_active_user
+from app.db.base import get_db
+from app.models.audit_log import AuditLog
+from app.models.user import User
+from app.schemas.audit_schemas import (
     AuditExportRequest,
     AuditLogListResponse,
     AuditLogQueryParams,

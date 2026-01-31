@@ -25,12 +25,26 @@ async def startup_event() -> None:
     await init_db()
     logger.info("Database initialized")
 
-    await init_qdrant()
-    logger.info("Qdrant collections initialized")
+    # Skip Qdrant initialization for local development
+    try:
+        if not getattr(settings, 'disable_vector_search', False):
+            await init_qdrant()
+            logger.info("Qdrant collections initialized")
+        else:
+            logger.info("Qdrant initialization skipped (disabled for local development)")
+    except Exception as e:
+        logger.warning(f"Qdrant initialization failed: {e}, continuing without vector search")
 
-    storage = StorageService()
-    await storage.ensure_buckets()
-    logger.info("Storage buckets ensured")
+    # Skip MinIO initialization for local development
+    try:
+        if not getattr(settings, 'disable_minio', False):
+            storage = StorageService()
+            await storage.ensure_buckets()
+            logger.info("Storage buckets ensured")
+        else:
+            logger.info("MinIO initialization skipped (disabled for local development)")
+    except Exception as e:
+        logger.warning(f"MinIO initialization failed: {e}, continuing without storage")
 
     # Warm up ML models if enabled
     ml_settings = get_ml_settings()
@@ -45,6 +59,65 @@ async def startup_event() -> None:
     # Start WebSocket background tasks
     await ws_server.start_background_tasks()
     logger.info("WebSocket background tasks started")
+
+    # Create demo account & workspace (development convenience)
+    try:
+        if getattr(settings, "demo_enabled", False):
+            from sqlalchemy import select
+            from uuid import uuid4
+            from app.core.security import hash_password
+            from app.models.user import User
+            from app.models.team import Team
+            from app.models.session import Session
+            from app.services.team_service import TeamService
+            from app.services.session_service import SessionService
+            from app.db.base import async_session_maker
+
+            async with async_session_maker() as db:
+                # Demo user
+                result = await db.execute(select(User).where(User.email == settings.demo_email))
+                demo_user = result.scalar_one_or_none()
+                if not demo_user:
+                    demo_user = User(
+                        id=uuid4(),
+                        email=settings.demo_email,
+                        hashed_password=hash_password(settings.demo_password),
+                        full_name=settings.demo_full_name,
+                        is_active=True,
+                        is_verified=True,
+                    )
+                    db.add(demo_user)
+                    await db.flush()
+                    logger.info("Demo user created", extra={"email": settings.demo_email})
+                else:
+                    demo_user.hashed_password = hash_password(settings.demo_password)
+                    demo_user.full_name = settings.demo_full_name
+                    demo_user.is_active = True
+                    demo_user.is_verified = True
+                    await db.flush()
+                    logger.info("Demo user updated", extra={"email": settings.demo_email})
+
+                # Demo team
+                team_result = await db.execute(select(Team).where(Team.name == settings.demo_team_name))
+                demo_team = team_result.scalar_one_or_none()
+                if not demo_team:
+                    team_service = TeamService(db)
+                    demo_team = await team_service.create_team(settings.demo_team_name, "Demo team created by startup seeder", str(demo_user.id))
+                    logger.info("Demo team created", extra={"team": settings.demo_team_name})
+
+                # Demo session
+                session_result = await db.execute(select(Session).where(Session.title == settings.demo_session_title))
+                demo_session = session_result.scalar_one_or_none()
+                if not demo_session:
+                    session_service = SessionService(db)
+                    demo_session = await session_service.create_session(
+                        type("T", (), {"team_id": str(demo_team.id), "title": settings.demo_session_title, "description": "This is a demo session to help you explore BioLoupe.", "topic_tags": ["demo"]})(),
+                        str(demo_user.id),
+                    )
+                    logger.info("Demo session created", extra={"session": settings.demo_session_title})
+                await db.commit()
+    except Exception as e:
+        logger.warning(f"Demo seeding failed: {e}")
 
     logger.info("Application startup complete")
 

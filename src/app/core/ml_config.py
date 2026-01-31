@@ -22,7 +22,7 @@ class MLSettings(BaseSettings):
     ml_enable_caching: bool = Field(default=True, alias="ML_ENABLE_CACHING")
     ml_batch_size: int = Field(default=32, alias="ML_BATCH_SIZE")
     ml_cache_ttl_seconds: int = Field(default=3600, alias="ML_CACHE_TTL_SECONDS")
-    ml_model_warmup: bool = Field(default=True, alias="ML_MODEL_WARMUP")
+    ml_model_warmup: bool = Field(default=False, alias="ML_MODEL_WARMUP")
     ml_precision: str = Field(default="float32", alias="ML_PRECISION")
     ml_unload_timeout_minutes: int = Field(
         default=30, alias="ML_UNLOAD_TIMEOUT_MINUTES"

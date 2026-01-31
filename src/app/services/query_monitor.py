@@ -20,4 +20,3 @@ class QueryMonitorService:
 
     def log_if_slow(self, sql: str, duration_ms: float, context: dict[str, object] | None = None) -> None:
         self._inspector.log_if_slow(sql, duration_ms, context)
-*** End of File

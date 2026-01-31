@@ -8,8 +8,7 @@ from app.api.dependencies.auth import get_current_active_user
 from app.api.dependencies.permissions import require_team_permission, team_role_required
 from app.core.exceptions import PermissionDenied
 from app.db.base import get_db
-from app.models import TeamRole, User
-from app.models import TeamMember
+from app.models import TeamMember, TeamRole, User
 from app.schemas.team_schemas import (
     TeamCreate,
     TeamInvitationAccept,
@@ -34,7 +33,7 @@ async def create_team(
     db: AsyncSession = Depends(get_db),
 ) -> TeamResponse:
     service = TeamService(db)
-    team = await service.create_team(payload.name, payload.description, str(current_user.id))
+    team = await service.create_team(payload.name, payload.description, current_user.id)
     return TeamResponse.model_validate(team)
 
 
@@ -44,7 +43,7 @@ async def list_teams(
     db: AsyncSession = Depends(get_db),
 ) -> list[TeamListResponse]:
     service = TeamService(db)
-    rows = await service.list_teams_for_user(str(current_user.id))
+    rows = await service.list_teams_for_user(current_user.id)
     return [TeamListResponse(**row) for row in rows]
 
 
@@ -69,50 +68,6 @@ async def update_team(
     service = TeamService(db)
     team = await service.update_team(team_id, payload.name, payload.description)
     return TeamResponse.model_validate(team)
-=======
-@router.get("/{team_id}")
-async def get_team(
-    team_id: str,
-    membership: Annotated[TeamMember, Depends(
-        lambda tid, user, svc, cache: require_team_permission(
-            tid,
-            [TeamRole.owner, TeamRole.admin, TeamRole.member, TeamRole.viewer],
-            user, svc, cache
-        )
-    )],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "team_id": team_id,
-        "user_role": membership.role.value,
-        "message": "Team retrieved successfully"
-    }
-
-
-@router.post("/{team_id}/members")
-async def add_team_member(
-    team_id: str,
-    membership: Annotated[TeamMember, Depends(require_team_admin)],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "team_id": team_id,
-        "message": "Member added successfully"
-    }
-
-
-@router.delete("/{team_id}/members/{user_id}")
-async def remove_team_member(
-    team_id: str,
-    user_id: str,
-    membership: Annotated[TeamMember, Depends(require_team_admin)],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "team_id": team_id,
-        "user_id": user_id,
-        "message": "Member removed successfully"
-    }
 
 
 @router.delete("/{team_id}")
@@ -224,13 +179,5 @@ async def accept_invitation(
     if invitation.email.lower() != current_user.email.lower():
         raise PermissionDenied("Invitation does not match user")
     service = TeamService(db)
-    await service.add_member(invitation.team_id, str(current_user.id), invitation.role)
+    await service.add_member(invitation.team_id, current_user.id, invitation.role)
     return {"status": "accepted"}
-=======
-    membership: Annotated[TeamMember, Depends(require_team_owner)],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "team_id": team_id,
-        "message": "Team deleted successfully"
-    }

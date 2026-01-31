@@ -29,4 +29,3 @@ class QueryInspector:
         if context:
             payload.update(context)
         logger.warning("Slow query detected", extra=payload)
-*** End of File

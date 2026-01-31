@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
+import uuid
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -91,7 +92,7 @@ async def list_sessions(
         return PaginatedResponse(items=[], total=0, skip=pagination.skip, limit=pagination.limit, has_more=False)
     service = SessionService(db)
     items, total_count = await service.list_sessions_paginated(
-        session_ids=[str(session_id) for session_id in session_ids],
+        session_ids=session_ids,
         team_id=team_id,
         include_archived=include_archived,
         tags=tags,
@@ -113,7 +114,8 @@ async def get_session_details(
     _session=Depends(session_permission_required([SessionPermission.read])),
     db: AsyncSession = Depends(get_db),
 ) -> SessionResponse:
-    session = await db.get(Session, session_id)
+    service = SessionService(db)
+    session = await service.get_session(session_id)
     return SessionResponse.model_validate(session)
 
 
@@ -128,116 +130,6 @@ async def update_session(
     service = SessionService(db)
     session = await service.update_session(session_id, payload, str(current_user.id))
     return SessionResponse.model_validate(session)
-=======
-@router.get("/{session_id}")
-async def get_session(
-    session_id: str,
-    session: Annotated[Session, Depends(
-        lambda sid, user, svc, cache: require_session_permission(
-            sid,
-            [SessionPermission.read, SessionPermission.write, SessionPermission.admin],
-            user, svc, cache
-        )
-    )],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "session_id": session_id,
-        "message": "Session retrieved successfully"
-    }
-
-
-@router.get("/{session_id}/details")
-async def get_session_details(
-    session_id: str,
-    session_data: Annotated[
-        Tuple[Session, SessionPermission],
-        Depends(get_session_with_permission)
-    ],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    _, permission = session_data
-
-    response = {
-        "session_id": session_id,
-        "permission": permission.value,
-        "basic_info": {}
-    }
-
-    if permission in [SessionPermission.write, SessionPermission.admin]:
-        response["edit_capabilities"] = True
-
-    if permission == SessionPermission.admin:
-        response["admin_capabilities"] = True
-
-    return response
-
-
-@router.post("/{session_id}/materials")
-async def add_material(
-    session_id: str,
-    session: Annotated[Session, Depends(
-        lambda sid, user, svc, cache: require_session_permission(
-            sid,
-            [SessionPermission.write, SessionPermission.admin],
-            user, svc, cache
-        )
-    )],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "session_id": session_id,
-        "message": "Material added successfully"
-    }
-
-
-@router.delete("/{session_id}/materials/{material_id}")
-async def delete_material(
-    session_id: str,
-    material_id: str,
-    session: Annotated[Session, Depends(
-        lambda sid, user, svc, cache: require_session_permission(
-            sid,
-            [SessionPermission.write, SessionPermission.admin],
-            user, svc, cache
-        )
-    )],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "session_id": session_id,
-        "material_id": material_id,
-        "message": "Material deleted successfully"
-    }
-
-
-@router.post("/{session_id}/participants")
-async def add_participant(
-    session_id: str,
-    session: Annotated[Session, Depends(
-        lambda sid, user, svc, cache: require_session_permission(
-            sid,
-            [SessionPermission.admin],
-            user, svc, cache
-        )
-    )],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "session_id": session_id,
-        "message": "Participant added successfully"
-    }
-
-
-@router.delete("/{session_id}")
-async def delete_session(
-    session_id: str,
-    current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
-) -> dict[str, str]:
-    await require_session_permission(session_id, [SessionPermission.admin], current_user, db)
-    service = SessionService(db)
-    await service.soft_delete_session(session_id, str(current_user.id))
     return {"status": "deleted"}
 
 
@@ -334,9 +226,10 @@ async def get_permissions(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, str]:
+    session_uuid = session_id if isinstance(session_id, uuid.UUID) else uuid.UUID(session_id)
     result = await db.execute(
         select(SessionParticipant.permission).where(
-            SessionParticipant.session_id == session_id,
+            SessionParticipant.session_id == session_uuid,
             SessionParticipant.user_id == current_user.id,
         )
     )
@@ -354,13 +247,14 @@ async def get_activity_log(
     db: AsyncSession = Depends(get_db),
 ) -> PaginatedResponse[ActivityLogResponse]:
     await require_session_permission(session_id, [SessionPermission.read], current_user, db)
+    session_uuid = session_id if isinstance(session_id, uuid.UUID) else uuid.UUID(session_id)
     total = await db.execute(
-        select(func.count(ActivityLog.id)).where(ActivityLog.session_id == session_id)
+        select(func.count(ActivityLog.id)).where(ActivityLog.session_id == session_uuid)
     )
     total_count = total.scalar_one()
     activity_result = await db.execute(
         select(ActivityLog)
-        .where(ActivityLog.session_id == session_id)
+        .where(ActivityLog.session_id == session_uuid)
         .order_by(ActivityLog.timestamp.desc())
         .offset(pagination.skip)
         .limit(pagination.limit)
@@ -419,25 +313,11 @@ async def list_material_tags(
     db: AsyncSession = Depends(get_db),
 ) -> list[str]:
     await require_session_permission(session_id, [SessionPermission.read], current_user, db)
+    session_uuid = session_id if isinstance(session_id, uuid.UUID) else uuid.UUID(session_id)
     result = await db.execute(
-        select(Material.metadata_).where(Material.session_id == session_id, Material.deleted_at.is_(None))
+        select(Material.metadata_).where(Material.session_id == session_uuid, Material.deleted_at.is_(None))
     )
     tags: set[str] = set()
     for metadata in result.scalars().all():
         tags.update((metadata or {}).get("tags", []))
     return sorted(tags)
-=======
-    session: Annotated[Session, Depends(
-        lambda sid, user, svc, cache: require_session_permission(
-            sid,
-            [SessionPermission.admin],
-            user, svc, cache
-        )
-    )],
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> dict:
-    return {
-        "session_id": session_id,
-        "message": "Session deleted successfully"
-    }
->>>>>>> 00e4fcc22b4ec00a947fe62a75ead858a9ba83a9

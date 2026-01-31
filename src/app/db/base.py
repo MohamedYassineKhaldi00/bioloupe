@@ -45,21 +45,34 @@ if os.environ.get("TESTING"):
     async def get_replica_db() -> AsyncGenerator[AsyncSession, None]:
         yield _DummySession()
 else:
-    engine = create_async_engine(
-        settings.database_url,
-        pool_size=settings.db_pool_size,
-        max_overflow=settings.db_max_overflow,
-        pool_pre_ping=True,
-    )
-
-    async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-    if settings.read_replica_url:
-        replica_engine = create_async_engine(
-            settings.read_replica_url,
+    # Check if using SQLite and adjust engine parameters accordingly
+    if settings.database_url.startswith("sqlite"):
+        engine = create_async_engine(
+            settings.database_url,
+            pool_pre_ping=True,
+        )
+    else:
+        engine = create_async_engine(
+            settings.database_url,
             pool_size=settings.db_pool_size,
             max_overflow=settings.db_max_overflow,
             pool_pre_ping=True,
         )
+
+    async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+    if settings.read_replica_url:
+        if settings.read_replica_url.startswith("sqlite"):
+            replica_engine = create_async_engine(
+                settings.read_replica_url,
+                pool_pre_ping=True,
+            )
+        else:
+            replica_engine = create_async_engine(
+                settings.read_replica_url,
+                pool_size=settings.db_pool_size,
+                max_overflow=settings.db_max_overflow,
+                pool_pre_ping=True,
+            )
         replica_session_maker = async_sessionmaker(replica_engine, expire_on_commit=False)
 
 

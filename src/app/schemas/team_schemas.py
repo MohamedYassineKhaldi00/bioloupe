@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr
 
@@ -19,16 +20,16 @@ class TeamUpdate(BaseModel):
 class TeamResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: uuid.UUID
     name: str
     description: str | None = None
-    created_by_id: str
+    created_by_id: uuid.UUID
     created_at: datetime
     updated_at: datetime
 
 
 class TeamListResponse(BaseModel):
-    id: str
+    id: uuid.UUID
     name: str
     description: str | None = None
     role: TeamRole
@@ -38,15 +39,15 @@ class TeamListResponse(BaseModel):
 class TeamMemberResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
-    team_id: str
-    user_id: str
+    id: uuid.UUID
+    team_id: uuid.UUID
+    user_id: uuid.UUID
     role: TeamRole
     joined_at: datetime
 
 
 class TeamMemberCreate(BaseModel):
-    user_id: str
+    user_id: uuid.UUID
     role: TeamRole = TeamRole.member
 
 

@@ -5,11 +5,11 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, String, Boolean, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import DateTime, Enum, ForeignKey, Index, String, Boolean, func, JSON
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ...app.db.base import Base
+from ..db.base import Base
 
 if TYPE_CHECKING:
     from app.models.user import User
@@ -83,7 +83,7 @@ class AuditLog(Base):
     )
     resource_id: Mapped[str] = mapped_column(String(100), nullable=False)
     success: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    details: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    details: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     correlation_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
 
     user: Mapped["User"] = relationship(back_populates="audit_logs")

@@ -5,10 +5,11 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Index, String, Text, UniqueConstraint, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base
+from ..db.base import Base
 from app.models.base import SoftDeleteMixin, TimestampMixin
 
 if TYPE_CHECKING:
@@ -33,7 +34,7 @@ class Session(Base, TimestampMixin, SoftDeleteMixin):
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    topic_tags: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default="[]", nullable=False)
+    topic_tags: Mapped[list[str]] = mapped_column(JSON, default=list, server_default="[]", nullable=False)
     created_by_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), index=True, nullable=True
     )

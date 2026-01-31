@@ -10,6 +10,12 @@ class ActivityService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
+    @staticmethod
+    def _as_uuid(value: str | uuid.UUID | None) -> uuid.UUID | None:
+        if value is None:
+            return None
+        return value if isinstance(value, uuid.UUID) else uuid.UUID(value)
+
     async def log(
         self,
         session_id: str,
@@ -21,11 +27,11 @@ class ActivityService:
     ) -> ActivityLog:
         entry = ActivityLog(
             id=uuid.uuid4(),
-            session_id=session_id,
-            user_id=user_id,
+            session_id=self._as_uuid(session_id),
+            user_id=self._as_uuid(user_id),
             action_type=action_type,
             entity_type=entity_type,
-            entity_id=entity_id,
+            entity_id=str(entity_id),
             details=details or {},
         )
         self.db.add(entry)

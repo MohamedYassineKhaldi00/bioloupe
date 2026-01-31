@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Annotated
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.dependencies.auth import get_current_user
@@ -18,7 +18,7 @@ from app.schemas.auth_schemas import (
     VerifyEmailRequest,
 )
 from app.services.rate_limiter import RateLimiter
-from ....app.services.token_service import (
+from app.services.token_service import (
     blacklist_refresh_token,
     extract_user_id_from_payload,
     generate_password_reset_token,
@@ -26,7 +26,7 @@ from ....app.services.token_service import (
     is_token_blacklisted,
     validate_and_decode_token,
 )
-from ....app.services.user_auth_service import (
+from app.services.user_auth_service import (
     authenticate_user_credentials,
     create_user_account,
     get_user_by_id,
@@ -36,11 +36,7 @@ from ....app.services.user_auth_service import (
 
 router = APIRouter()
 
-rate_limiter = RateLimiter(
-    max_attempts=5,
-    window_seconds=900,
-    key_prefix="auth:login:"
-)
+rate_limiter = RateLimiter()
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -56,7 +52,12 @@ async def login(
     request: LoginRequest,
     db: Annotated[AsyncSession, Depends(get_db)]
 ) -> TokenResponse:
-    await rate_limiter.check_rate_limit(request.email)
+    result = await rate_limiter.check(f"auth:login:{request.email}", limit=5, window_seconds=900)
+    if not result.allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many login attempts. Try again later.",
+        )
     user = await authenticate_user_credentials(request.email, request.password, db)
     return await generate_token_pair(user.id, user.email)
 
@@ -66,7 +67,7 @@ async def refresh_token(
     request: RefreshTokenRequest,
     db: Annotated[AsyncSession, Depends(get_db)]
 ) -> TokenResponse:
-    from ....app.core.exceptions import InvalidToken
+    from app.core.exceptions import InvalidToken
 
     if await is_token_blacklisted(request.refresh_token):
         raise InvalidToken()
@@ -82,12 +83,13 @@ async def refresh_token(
     return await generate_token_pair(user.id, user.email)
 
 
-@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(
     refresh_token: str,
     current_user: Annotated[User, Depends(get_current_user)]
-) -> None:
+) -> dict[str, str]:
     await blacklist_refresh_token(refresh_token)
+    return {"status": "logged_out"}
 
 
 @router.post("/verify-email", response_model=UserResponse)

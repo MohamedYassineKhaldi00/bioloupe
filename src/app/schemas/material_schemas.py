@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import uuid
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models import MaterialType
 
 
 class MaterialCreate(BaseModel):
-    session_id: str
+    session_id: uuid.UUID
     material_type: MaterialType
     title: str
     metadata: dict | None = None
@@ -20,15 +21,15 @@ class MaterialUpdate(BaseModel):
 
 
 class MaterialResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
-    id: str
-    session_id: str
-    uploaded_by_id: str | None = None
+    id: uuid.UUID
+    session_id: uuid.UUID
+    uploaded_by_id: uuid.UUID | None = None
     material_type: MaterialType
     title: str
     file_url: str | None = None
-    metadata: dict | None = None
+    metadata: dict | None = Field(default=None, alias="metadata_")
     qdrant_point_id: str | None = None
     created_at: datetime
     updated_at: datetime
@@ -36,8 +37,10 @@ class MaterialResponse(BaseModel):
 
 
 class MaterialListResponse(BaseModel):
-    id: str
-    session_id: str
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    session_id: uuid.UUID
     material_type: MaterialType
     title: str
     created_at: datetime
@@ -45,7 +48,7 @@ class MaterialListResponse(BaseModel):
 
 
 class MaterialUploadInitiate(BaseModel):
-    session_id: str
+    session_id: uuid.UUID
     material_type: MaterialType
     title: str
     filename: str
@@ -54,7 +57,7 @@ class MaterialUploadInitiate(BaseModel):
 
 
 class MaterialUploadInitiateResponse(BaseModel):
-    material_id: str
+    material_id: uuid.UUID
     upload_url: str | None = None
     upload_id: str | None = None
     parts: list[dict[str, str | int]] | None = None
@@ -67,12 +70,12 @@ class MaterialUploadComplete(BaseModel):
 
 
 class MaterialBatchCreate(BaseModel):
-    session_id: str
+    session_id: uuid.UUID
     materials: list[MaterialCreate]
 
 
 class MaterialBatchUpdateItem(BaseModel):
-    material_id: str
+    material_id: uuid.UUID
     metadata: dict | None = None
 
 
@@ -86,7 +89,7 @@ class MaterialTagUpdate(BaseModel):
 
 class MaterialSearchParams(BaseModel):
     query: str
-    session_id: str | None = None
+    session_id: uuid.UUID | None = None
     material_type: MaterialType | None = None
 
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from app.core.config import get_settings
 from app.core.exceptions import RateLimitExceeded
-from app.db.base import RateLimiter
+from app.services.rate_limiter import RateLimiter
 
 
 class ThrottlingService:
@@ -31,4 +31,3 @@ class ThrottlingService:
             "limit": limit,
             "reset_in": result.reset_in,
         }
-*** End of File

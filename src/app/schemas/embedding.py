@@ -5,11 +5,13 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class EmbeddingResponse(BaseModel):
     """Response schema for single embedding."""
+
+    model_config = ConfigDict(protected_namespaces=())
 
     material_id: uuid.UUID
     embedding: list[float]

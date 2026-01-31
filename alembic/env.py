@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
+from app.core.config import get_settings  # noqa: E402
 from app.db.base import Base  # noqa: E402
 from app.models import (  # noqa: F401,E402
     ActivityLog,
@@ -27,9 +28,8 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-database_url = os.getenv("DATABASE_URL")
-if database_url:
-    config.set_main_option("sqlalchemy.url", database_url)
+database_url = os.getenv("DATABASE_URL") or get_settings().database_url
+config.set_main_option("sqlalchemy.url", database_url)
 
 target_metadata = Base.metadata
 

@@ -6,11 +6,11 @@ import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...app.core.config import get_settings
-from ...app.core.exceptions import InvalidRequest
-from ...app.models.oauth_account import OAuthAccount
-from ...app.models.user import User
-from ...app.schemas.oauth_schemas import OAuthToken, OAuthUserInfo
+from app.core.config import get_settings
+from app.core.exceptions import InvalidRequest
+from app.models.oauth_account import OAuthAccount
+from app.models.user import User
+from app.schemas.oauth_schemas import OAuthToken, OAuthUserInfo
 
 
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
