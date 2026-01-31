@@ -51,6 +51,11 @@ class Settings(BaseSettings):
         default=True, alias="AUDIT_ENABLE_BACKGROUND_LOGGING"
     )
 
+    # Email verification (disable for development)
+    require_email_verification: bool = Field(
+        default=True, alias="REQUIRE_EMAIL_VERIFICATION"
+    )
+
     # Admin seeding
     seed_admin_email: str | None = Field(default=None, alias="SEED_ADMIN_EMAIL")
     seed_admin_password: str | None = Field(default=None, alias="SEED_ADMIN_PASSWORD")

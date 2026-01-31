@@ -3,9 +3,9 @@ from __future__ import annotations
 from fastapi import APIRouter, status
 from pydantic import BaseModel
 
-from ....db.base import verify_connection
-from ....db.redis_client import get_redis
-from ....services.qdrant_service import QdrantService
+from app.db.base import verify_connection
+from app.db.redis_client import get_redis
+from app.services.qdrant_service import QdrantService
 
 router = APIRouter(prefix="/health", tags=["health"])
 

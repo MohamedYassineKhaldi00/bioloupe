@@ -59,7 +59,7 @@ except Exception:
 
 # AI/Hypothesis generation endpoint
 try:
-    from ...api.v1.endpoints import hypotheses
+    from app.api.v1.endpoints import hypotheses
     api_router.include_router(hypotheses.router, tags=["hypotheses"])
 except Exception:
     pass
